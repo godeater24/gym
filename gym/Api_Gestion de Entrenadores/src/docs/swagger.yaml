@@ -1,0 +1,315 @@
+openapi: 3.0.0
+info:
+  title: Trainer Management API
+  description: API for managing gym trainers and their activities
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /trainers:
+    get:
+      summary: Get all trainers
+      tags:
+        - Trainers
+      responses:
+        '200':
+          description: A list of trainers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                        example: 3
+                      trainers:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Trainer'
+    post:
+      summary: Create a new trainer
+      tags:
+        - Trainers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrainerInput'
+      responses:
+        '201':
+          description: Trainer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Trainer created successfully
+                  data:
+                    type: object
+                    properties:
+                      trainer:
+                        $ref: '#/components/schemas/Trainer'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /trainers/{id}:
+    get:
+      summary: Get a trainer by ID
+      tags:
+        - Trainers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the trainer
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Trainer details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      trainer:
+                        $ref: '#/components/schemas/Trainer'
+        '404':
+          description: Trainer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update a trainer
+      tags:
+        - Trainers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the trainer
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrainerInput'
+      responses:
+        '200':
+          description: Trainer updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Trainer updated successfully
+                  data:
+                    type: object
+                    properties:
+                      trainer:
+                        $ref: '#/components/schemas/Trainer'
+        '404':
+          description: Trainer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a trainer
+      tags:
+        - Trainers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the trainer
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Trainer deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Trainer deleted successfully
+        '404':
+          description: Trainer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /trainers/{id}/activities:
+    get:
+      summary: Get activities for a trainer
+      tags:
+        - Activities
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the trainer
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of activities for the trainer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      trainer:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          nombre:
+                            type: string
+                      count:
+                        type: integer
+                      activities:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Activity'
+        '404':
+          description: Trainer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Trainer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        nombre:
+          type: string
+          example: "Juan Pérez"
+        especialidad:
+          type: string
+          example: "Entrenamiento funcional"
+        horarios:
+          type: array
+          items:
+            type: string
+          example: ["lunes 8am", "miércoles 10am"]
+        certificaciones:
+          type: array
+          items:
+            type: string
+          example: ["CrossFit Level 1", "NASM CPT"]
+    
+    TrainerInput:
+      type: object
+      required:
+        - nombre
+        - especialidad
+        - horarios
+        - certificaciones
+      properties:
+        nombre:
+          type: string
+          example: "Juan Pérez"
+        especialidad:
+          type: string
+          example: "Entrenamiento funcional"
+        horarios:
+          type: array
+          items:
+            type: string
+          example: ["lunes 8am", "miércoles 10am"]
+        certificaciones:
+          type: array
+          items:
+            type: string
+          example: ["CrossFit Level 1", "NASM CPT"]
+    
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        nombre:
+          type: string
+          example: "Entrenamiento funcional - principiantes"
+        descripcion:
+          type: string
+          example: "Clase de entrenamiento funcional para principiantes"
+        trainerId:
+          type: string
+          example: "1"
+        duracion:
+          type: integer
+          example: 60
+        capacidad:
+          type: integer
+          example: 15
+        dias:
+          type: array
+          items:
+            type: string
+          example: ["lunes", "miércoles", "viernes"]
+        hora:
+          type: string
+          example: "8am"
+    
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "Resource not found"
